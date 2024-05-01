@@ -1,10 +1,9 @@
 import socket
-import sys
 import threading
 import json
 
 indirizzo_ip = "127.0.0.1"
-porta = 60460
+porta = 60466
 lunghezza_header = 10
 
 def ricevi_messaggi(socket_del_client):
