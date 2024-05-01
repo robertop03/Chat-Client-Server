@@ -2,9 +2,8 @@ import socket
 import threading
 import sys
 
-indirizzo_ip = "127.0.0.1"
-porta = 60466
-lunghezza_header = 10
+indirizzo_ip = '127.0.0.1'
+porta = 60467
 
 socket_del_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 socket_del_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -26,34 +25,31 @@ def controllo_ctrl_c():
             socket_del_server.close()
             sys.exit(0)
 
-ctrl_c_thread = threading.Thread(target=controllo_ctrl_c)
-ctrl_c_thread.daemon = True
-ctrl_c_thread.start()
-
-def gestisci_cliente(client_socket, nome_utente):
+def gestisci_client(client_socket, nome_utente):
     try:
-        while True:
+        while 1:
             messaggio = client_socket.recv(1024)
-            if not messaggio:
-                print(f'Connessione chiusa da: {nome_utente}')
-                break
 
-            for destinatario_socket in connected_clients.items():
+            for destinatario_socket, _ in connected_clients.items():
                 if destinatario_socket != client_socket:
                     destinatario_socket.send(messaggio)
 
-    except Exception as e:
-        print(f'Errore nella gestione del client {nome_utente}: {str(e)}')
+    except Exception as _:
+        print(f'Il client {nome_utente} si è disconnesso')
 
     finally:
         client_socket.close()
         del connected_clients[client_socket]
 
 
-while True:
+ctrl_c_thread = threading.Thread(target=controllo_ctrl_c)
+ctrl_c_thread.daemon = 1
+ctrl_c_thread.start()
+
+while 1:
     client_socket, client_address = socket_del_server.accept()
     nome_utente = client_socket.recv(1024).decode()
     connected_clients[client_socket] = nome_utente
     print(f'Nuovo utente connesso {client_address}, nome: {nome_utente}')
-    client_thread = threading.Thread(target=gestisci_cliente, args=(client_socket, nome_utente))
+    client_thread = threading.Thread(target=gestisci_client, args=(client_socket, nome_utente))
     client_thread.start()
