@@ -1,7 +1,6 @@
 import socket
 import threading
 import sys
-import json
 
 indirizzo_ip = "127.0.0.1"
 porta = 60466
@@ -39,11 +38,7 @@ def gestisci_cliente(client_socket, nome_utente):
                 print(f'Connessione chiusa da: {nome_utente}')
                 break
 
-            messaggio_decodificato = json.loads(messaggio.decode())
-            mittente = messaggio_decodificato["mittente"]
-            contenuto = messaggio_decodificato["contenuto"]
-
-            for destinatario_socket, destinatario_nome in connected_clients.items():
+            for destinatario_socket in connected_clients.items():
                 if destinatario_socket != client_socket:
                     destinatario_socket.send(messaggio)
 
